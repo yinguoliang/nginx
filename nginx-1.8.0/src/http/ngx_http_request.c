@@ -488,7 +488,9 @@ ngx_http_wait_request_handler(ngx_event_t *rev)
     c->log->action = "reading client request line";
 
     ngx_reusable_connection(c, 0);
-
+    /*
+    *  创建ngx_http_request_t
+    */
     c->data = ngx_http_create_request(c);
     if (c->data == NULL) {
         ngx_http_close_connection(c);
@@ -969,9 +971,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
                 if (rc == NGX_DECLINED) {
                     ngx_log_error(NGX_LOG_INFO, c->log, 0, "client sent invalid host in request line");
                     /*
-                    *  ***************   关键步骤  **************
-                    *  ngx_http_finalize_request: 执行多阶段处理等
-                    *  ***************   关键步骤  **************
+                    *  结束HTTP请求
                     */
                     ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
                     return;
@@ -1021,7 +1021,11 @@ ngx_http_process_request_line(ngx_event_t *rev)
             c->log->action = "reading client request headers";
             //请求对应的读事件结构的处理函数
             rev->handler = ngx_http_process_request_headers;
-            //循环的读取所有的请求头，并保存和初始化和请求头相关的结构
+            /* 
+            *  ******************* 关键方法 ****************
+            *  循环的读取所有的请求头，并保存和初始化和请求头相关的结构
+            *  如果header都处理完后了，就调用 ngx_http_process_request 处理请求
+            */
             ngx_http_process_request_headers(rev);//立即调用
 
             return;
@@ -1033,9 +1037,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
 
             ngx_log_error(NGX_LOG_INFO, c->log, 0, ngx_http_client_errors[rc - NGX_HTTP_CLIENT_ERROR]);
             /*
-            *  ***************   关键步骤  **************
-            *  ngx_http_finalize_request: 执行多阶段处理等
-            *  ***************   关键步骤  **************
+            *  结束HTTP请求
             */
             ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
             return;
@@ -1058,9 +1060,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
 
                 ngx_log_error(NGX_LOG_INFO, c->log, 0, "client sent too long URI");
                 /*
-                *  ***************   关键步骤  **************
-                *  ngx_http_finalize_request: 执行多阶段处理等
-                *  ***************   关键步骤  **************
+                *  结束HTTP请求
                 */
                 ngx_http_finalize_request(r, NGX_HTTP_REQUEST_URI_TOO_LARGE);
                 return;
@@ -1335,7 +1335,9 @@ ngx_http_process_request_headers(ngx_event_t *rev)
 
             continue; //继续处理下一个header
         }
-
+        /*
+        *   所有的header都处理完成了
+        */
         if (rc == NGX_HTTP_PARSE_HEADER_DONE) {
 
             /* a whole header has been parsed successfully */
@@ -1373,7 +1375,7 @@ ngx_http_process_request_headers(ngx_event_t *rev)
                       r->header_name_start);
         ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
         return;
-    }
+    } //结束for循环
 }
 
 
@@ -1908,7 +1910,8 @@ ngx_http_process_request(ngx_http_request_t *r)
     }
 
 #endif
-
+    //因为已经接收完http请求行、请求头部了，准备调用各个http模块处理请求了。
+    //因此不需要接收任何来自客户端的读事件，也就不存在接收http请求头部超时问题 
     if (c->read->timer_set) {
         ngx_del_timer(c->read);
     }
@@ -1919,12 +1922,27 @@ ngx_http_process_request(ngx_http_request_t *r)
     (void) ngx_atomic_fetch_add(ngx_stat_writing, 1);
     r->stat_writing = 1;
 #endif
-
+    /*
+    *  ****************************
+    *  修改ngx_http_connetion_t的读写处理函数
+    *  以及 ngx_http_request_t的读处理函数
+    *  为什么要修改呢？？？？？？？
+    *  按理http请求一次就应该能处理完，接受到多余的请求，需要另外处理
+    *  ****************************
+    */
+    //重新设置当前连接的读写事件回调
+    //注意：ngx_http_process_request函数只会被调用一次
+    //如果一次调度并不能处理完11个http阶段，那会将连接对象对应的读事件、写事件回调设置为ngx_http_request_handler。
+    //注意：这里的额read->hander和write->hander原来是有值得，这里是修改回调函数（不是设置）
     c->read->handler = ngx_http_request_handler;
     c->write->handler = ngx_http_request_handler;
+    //修改请求对象的读事件回调，原来的回调函数是ngx_http_core_run_phases
     r->read_event_handler = ngx_http_block_reading;
-    ngx_log_error(NGX_LOG_ERR, c->log, 0, "yyy:: call ngx_http_handler ....\n");
+    
+    //调用各个http模块协同处理这个请求
+    ngx_log_error(NGX_LOG_ERR, c->log, 0, "yyy:: call ngx_http_handler ....\n");  
     ngx_http_handler(r);
+    //处理子请求，关于nginx子请求，自行搜索网上的文档
     ngx_log_error(NGX_LOG_ERR, c->log, 0, "yyy:: call ngx_http_run_posted_requests ....\n");
     ngx_http_run_posted_requests(c);
 }
