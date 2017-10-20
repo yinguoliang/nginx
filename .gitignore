@@ -1,4 +1,6 @@
 nginx-1.8.0/objs/
+build/
+*.log
 sites
 *.d
 
