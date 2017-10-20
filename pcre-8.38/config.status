@@ -437,7 +437,7 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/Users/yinguoliang/Documents/codes/nginx2/pcre-8.38'
+ac_pwd='/Users/yinguoliang/Documents/codes/nginx/pcre-8.38'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
 MKDIR_P='./install-sh -c -d'
@@ -1012,12 +1012,12 @@ S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="./install-sh -c -d"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]="strip"
-S["install_sh"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/install-sh"
-S["MAKEINFO"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing makeinfo"
-S["AUTOHEADER"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing autoheader"
-S["AUTOMAKE"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing automake-1.15"
-S["AUTOCONF"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing autoconf"
-S["ACLOCAL"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing aclocal-1.15"
+S["install_sh"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/install-sh"
+S["MAKEINFO"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing makeinfo"
+S["AUTOHEADER"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing autoheader"
+S["AUTOMAKE"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing automake-1.15"
+S["AUTOCONF"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing autoconf"
+S["ACLOCAL"]="${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing aclocal-1.15"
 S["VERSION"]="8.38"
 S["PACKAGE"]="pcre"
 S["CYGPATH_W"]="echo"

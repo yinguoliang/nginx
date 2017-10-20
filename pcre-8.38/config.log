@@ -30,8 +30,8 @@ Kernel configured for up to 4 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3
 Primary memory available: 8.00 gigabytes
-Default processor set: 288 tasks, 1085 threads, 4 processors
-Load average: 3.13, Mach factor: 0.88
+Default processor set: 289 tasks, 1094 threads, 4 processors
+Load average: 2.52, Mach factor: 1.56
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
@@ -1560,7 +1560,7 @@ pcre_cv_cc_visibility=yes
 ## Output variables. ##
 ## ----------------- ##
 
-ACLOCAL='${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing aclocal-1.15'
+ACLOCAL='${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing aclocal-1.15'
 AMDEPBACKSLASH='\'
 AMDEP_FALSE='#'
 AMDEP_TRUE=''
@@ -1571,9 +1571,9 @@ AM_DEFAULT_VERBOSITY='0'
 AM_V='$(V)'
 AR='ar'
 AS='as'
-AUTOCONF='${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing autoconf'
-AUTOHEADER='${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing autoheader'
-AUTOMAKE='${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing automake-1.15'
+AUTOCONF='${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing autoconf'
+AUTOHEADER='${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing autoheader'
+AUTOMAKE='${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing automake-1.15'
 AWK='awk'
 CC='cc'
 CCDEPMODE='depmode=gcc3'
@@ -1625,7 +1625,7 @@ LIPO='lipo'
 LN_S='ln -s'
 LTLIBOBJS=''
 LT_SYS_LIBRARY_PATH=''
-MAKEINFO='${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/missing makeinfo'
+MAKEINFO='${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/missing makeinfo'
 MANIFEST_TOOL=':'
 MKDIR_P='./install-sh -c -d'
 NM='/usr/bin/nm -B'
@@ -1723,7 +1723,7 @@ host_vendor='apple'
 htmldir='${docdir}/html'
 includedir='${prefix}/include'
 infodir='${datarootdir}/info'
-install_sh='${SHELL} /Users/yinguoliang/Documents/codes/nginx2/pcre-8.38/install-sh'
+install_sh='${SHELL} /Users/yinguoliang/Documents/codes/nginx/pcre-8.38/install-sh'
 libdir='${exec_prefix}/lib'
 libexecdir='${exec_prefix}/libexec'
 localedir='${datarootdir}/locale'
