@@ -1,43 +1,43 @@
 --------------------
 ./configure
-2017年10月20日 星期五 14时10分36秒 CST
-=== ztest63014.c ===
+2017年10月20日 星期五 14时28分14秒 CST
+=== ztest74095.c ===
 extern int getchar();
 int hello() {return getchar();}
 ===
-cc -c ztest63014.c
+cc -c ztest74095.c
 ... using gcc
 
 Checking for obsessive-compulsive compiler options...
-=== ztest63014.c ===
+=== ztest74095.c ===
 int foo() { return 0; }
 ===
-cc -c -O2 -pipe ztest63014.c
+cc -c -O2 -pipe ztest74095.c
 
 Checking for shared library support...
-=== ztest63014.c ===
+=== ztest74095.c ===
 extern int getchar();
 int hello() {return getchar();}
 ===
-cc -w -c -O2 -pipe -fPIC ztest63014.c
-cc -dynamiclib -install_name ${exec_prefix}/lib/libz.1.dylib -compatibility_version 1 -current_version 1.2.11 -O2 -pipe -fPIC -o ztest63014.dylib ztest63014.o
+cc -w -c -O2 -pipe -fPIC ztest74095.c
+cc -dynamiclib -install_name ${exec_prefix}/lib/libz.1.dylib -compatibility_version 1 -current_version 1.2.11 -O2 -pipe -fPIC -o ztest74095.dylib ztest74095.o
 Building shared library libz.1.2.11.dylib with cc.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <stdio.h>
 #include <stdlib.h>
 size_t dummy = 0;
 ===
-cc -c -O2 -pipe ztest63014.c
+cc -c -O2 -pipe ztest74095.c
 Checking for size_t... Yes.
 
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <sys/types.h>
 off64_t dummy = 0;
 ===
-cc -c -O2 -pipe -D_LARGEFILE64_SOURCE=1 ztest63014.c
-ztest63014.c:2:1: error: unknown type name 'off64_t'; did you mean 'off_t'?
+cc -c -O2 -pipe -D_LARGEFILE64_SOURCE=1 ztest74095.c
+ztest74095.c:2:1: error: unknown type name 'off64_t'; did you mean 'off_t'?
 off64_t dummy = 0;
 ^~~~~~~
 off_t
@@ -48,39 +48,39 @@ typedef __darwin_off_t          off_t;
 (exit code 1)
 Checking for off64_t... No.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <stdio.h>
 int main(void) {
   fseeko(NULL, 0, 0);
   return 0;
 }
 ===
-cc -O2 -pipe -o ztest63014 ztest63014.c
+cc -O2 -pipe -o ztest74095 ztest74095.c
 Checking for fseeko... Yes.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <string.h>
 #include <errno.h>
 int main() { return strlen(strerror(errno)); }
 ===
-cc -O2 -pipe -o ztest63014 ztest63014.c
+cc -O2 -pipe -o ztest74095 ztest74095.c
 Checking for strerror... Yes.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <unistd.h>
 int main() { return 0; }
 ===
-cc -c -O2 -pipe ztest63014.c
+cc -c -O2 -pipe ztest74095.c
 Checking for unistd.h... Yes.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <stdarg.h>
 int main() { return 0; }
 ===
-cc -c -O2 -pipe ztest63014.c
+cc -c -O2 -pipe ztest74095.c
 Checking for stdarg.h... Yes.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <stdio.h>
 #include <stdarg.h>
 #include "zconf.h"
@@ -92,10 +92,10 @@ int main()
   return 0;
 }
 ===
-cc -c -O2 -pipe ztest63014.c
+cc -c -O2 -pipe ztest74095.c
 Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <stdio.h>
 #include <stdarg.h>
 int mytest(const char *fmt, ...)
@@ -112,10 +112,10 @@ int main()
   return (mytest("Hello%d\n", 1));
 }
 ===
-cc -O2 -pipe -o ztest63014 ztest63014.c
+cc -O2 -pipe -o ztest74095 ztest74095.c
 Checking for vsnprintf() in stdio.h... Yes.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #include <stdio.h>
 #include <stdarg.h>
 int mytest(const char *fmt, ...)
@@ -133,10 +133,10 @@ int main()
   return (mytest("Hello%d\n", 1));
 }
 ===
-cc -c -O2 -pipe ztest63014.c
+cc -c -O2 -pipe ztest74095.c
 Checking for return value of vsnprintf()... Yes.
 
-=== ztest63014.c ===
+=== ztest74095.c ===
 #define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
 int ZLIB_INTERNAL foo;
 int main()
@@ -144,7 +144,7 @@ int main()
   return 0;
 }
 ===
-cc -c -O2 -pipe ztest63014.c
+cc -c -O2 -pipe ztest74095.c
 Checking for attribute(visibility) support... Yes.
 
 ALL = static shared
