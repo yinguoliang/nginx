@@ -557,7 +557,7 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
     if (r->request_body) {
         u->request_bufs = r->request_body->bufs;
     }
-
+    // 创建请求体（发给上游服务器的）
     if (u->create_request(r) != NGX_OK) {
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
         return;
@@ -629,7 +629,7 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
                 return;
             }
-
+            // 建立与上游服务器的链接， 并发送请求
             ngx_http_upstream_connect(r, u);
 
             return;
@@ -1437,7 +1437,9 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
     }
 
 #endif
-
+    /*
+    *    当建立了与上游服务器的连接后，就会向上游服务器发送请求
+    */ 
     ngx_http_upstream_send_request(r, u, 1);
 }
 
@@ -1752,7 +1754,9 @@ ngx_http_upstream_reinit(ngx_http_request_t *r, ngx_http_upstream_t *u)
     return NGX_OK;
 }
 
-
+/*
+*   当建立了与上游服务器的连接后，就会向上游服务器发送请求
+*/
 static void
 ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u,
     ngx_uint_t do_write)
@@ -1783,7 +1787,9 @@ ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u,
         ngx_http_upstream_finalize_request(r, u, rc);
         return;
     }
-
+    /*
+    *  数据还没发送完
+    */
     if (rc == NGX_AGAIN) {
         if (!c->write->ready) {
             ngx_add_timer(c->write, u->conf->send_timeout);

@@ -30,8 +30,8 @@ Kernel configured for up to 4 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3
 Primary memory available: 8.00 gigabytes
-Default processor set: 289 tasks, 1164 threads, 4 processors
-Load average: 3.36, Mach factor: 1.28
+Default processor set: 295 tasks, 1158 threads, 4 processors
+Load average: 3.20, Mach factor: 0.93
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
@@ -77,13 +77,13 @@ configure:3533: checking for gcc
 configure:3560: result: cc
 configure:3789: checking for C compiler version
 configure:3798: cc --version >&5
-Apple LLVM version 9.0.0 (clang-900.0.37)
+Apple LLVM version 9.0.0 (clang-900.0.38)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
 configure:3809: $? = 0
 configure:3798: cc -v >&5
-Apple LLVM version 9.0.0 (clang-900.0.37)
+Apple LLVM version 9.0.0 (clang-900.0.38)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
@@ -149,13 +149,13 @@ configure:4698: checking for gcc
 configure:4725: result: cc
 configure:4954: checking for C compiler version
 configure:4963: cc --version >&5
-Apple LLVM version 9.0.0 (clang-900.0.37)
+Apple LLVM version 9.0.0 (clang-900.0.38)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
 configure:4974: $? = 0
 configure:4963: cc -v >&5
-Apple LLVM version 9.0.0 (clang-900.0.37)
+Apple LLVM version 9.0.0 (clang-900.0.38)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
@@ -183,7 +183,7 @@ configure:5450: found /usr/bin/g++
 configure:5461: result: g++
 configure:5488: checking for C++ compiler version
 configure:5497: g++ --version >&5
-Apple LLVM version 9.0.0 (clang-900.0.37)
+Apple LLVM version 9.0.0 (clang-900.0.38)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin
@@ -191,7 +191,7 @@ Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-inc
 configure:5508: $? = 0
 configure:5497: g++ -v >&5
 Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
-Apple LLVM version 9.0.0 (clang-900.0.37)
+Apple LLVM version 9.0.0 (clang-900.0.38)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
 InstalledDir: /Library/Developer/CommandLineTools/usr/bin

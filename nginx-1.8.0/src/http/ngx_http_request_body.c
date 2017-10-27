@@ -25,7 +25,12 @@ static ngx_int_t ngx_http_request_body_length_filter(ngx_http_request_t *r,
 static ngx_int_t ngx_http_request_body_chunked_filter(ngx_http_request_t *r,
     ngx_chain_t *in);
 
-
+/*
+*  ngx_http_read_client_request_body 函数主要是读取客户端的HTTP请求内容
+*  核心功能就是复制客户端数据
+*  读取完成之后，调用post_hander处理数据
+*  post_handler是外部传入的，用于处理不同的业务，例如反向代理时post_hander为 ngx_http_upstream_init 
+*/
 ngx_int_t
 ngx_http_read_client_request_body(ngx_http_request_t *r,
     ngx_http_client_body_handler_pt post_handler)
@@ -47,13 +52,16 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
         goto done;
     }
 #endif
-
+    /*
+    *  不是主请求、或者已经读取了请求体、或者已经丢弃了请求体：这三种情况不需要读取请求体
+    *  注：子请求一般不需要自己读取请求体
+    */
     if (r != r->main || r->request_body || r->discard_body) {
         r->request_body_no_buffering = 0;
         post_handler(r);
         return NGX_OK;
     }
-
+    //测试客户端是否发了 100-continue请求头，如果有，则响应
     if (ngx_http_test_expect(r) != NGX_OK) {
         rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
         goto done;
@@ -63,6 +71,10 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
         r->request_body_in_file_only = 0;
     }
 
+    /*
+    *  分配一个ngx_http_request_body_t结构体
+    *  这个结构体用来保存请求体读取过程中的缓存引用、临时文件引用、剩余请求体大小等信息。
+    */
     rb = ngx_pcalloc(r->pool, sizeof(ngx_http_request_body_t));
     if (rb == NULL) {
         rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
@@ -80,10 +92,12 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
      */
 
     rb->rest = -1;
-    rb->post_handler = post_handler;
+    rb->post_handler = post_handler;  //异步读取完成之后调用
 
     r->request_body = rb;
-
+    /*
+    *  检查请求体是否含有 content_length 头， 如果么有，则表示客户端没有发送请求体内容。
+    */
     if (r->headers_in.content_length_n < 0 && !r->headers_in.chunked) {
         r->request_body_no_buffering = 0;
         post_handler(r);
@@ -91,7 +105,7 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
     }
 
     preread = r->header_in->last - r->header_in->pos;
-
+    //是否预读了请求体
     if (preread) {
 
         /* there is the pre-read part of the request body */
@@ -110,6 +124,8 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
 
         r->request_length += preread - (r->header_in->last - r->header_in->pos);
 
+
+        // 空间不够用了，申请更多
         if (!r->headers_in.chunked
             && rb->rest > 0
             && rb->rest <= (off_t) (r->header_in->end - r->header_in->last))
@@ -284,7 +300,11 @@ ngx_http_read_client_request_body_handler(ngx_http_request_t *r)
     }
 }
 
-
+/*
+*  真正读取请求体的操作
+*  该函数循环的读取请求体并保存在缓存中，
+*  如果缓存被写满了，其中的数据会被清空并写回到临时文件中。
+*/
 static ngx_int_t
 ngx_http_do_read_client_request_body(ngx_http_request_t *r)
 {
@@ -306,8 +326,18 @@ ngx_http_do_read_client_request_body(ngx_http_request_t *r)
 
     for ( ;; ) {
         for ( ;; ) {
+            // pos : 数据处理到的当前位置
+            // last: 有效内容的当前位置
+            // start: 缓存区的起始位置
+            // end : 缓存区的结束位置
+            
+            /*
+            *   last == end 表示缓存区已经满了
+            *   则先将缓冲区数据处理掉，然后重置缓冲区，继续读取
+            */
             if (rb->buf->last == rb->buf->end) {
-
+                // pos != last 表示数据还没有处理完，
+                // 将buf赋给out
                 if (rb->buf->pos != rb->buf->last) {
 
                     /* pass buffer to request body filter chain */
@@ -347,7 +377,7 @@ ngx_http_do_read_client_request_body(ngx_http_request_t *r)
 
                     return NGX_HTTP_INTERNAL_SERVER_ERROR;
                 }
-
+                // 重置buf
                 rb->buf->pos = rb->buf->start;
                 rb->buf->last = rb->buf->start;
             }
@@ -401,7 +431,7 @@ ngx_http_do_read_client_request_body(ngx_http_request_t *r)
             if (rb->buf->last < rb->buf->end) {
                 break;
             }
-        }
+        } //内存for循环退出
 
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
                        "http client request body rest %O", rb->rest);
@@ -436,12 +466,12 @@ ngx_http_do_read_client_request_body(ngx_http_request_t *r)
 
             return NGX_AGAIN;
         }
-    }
+    } // 外层for循环退出
 
     if (c->read->timer_set) {
         ngx_del_timer(c->read);
     }
-
+    // 根据配置，将读取到的数据存入临时文件
     if (rb->temp_file || r->request_body_in_file_only) {
 
         /* save the last part */
@@ -856,6 +886,13 @@ ngx_http_discard_request_body_filter(ngx_http_request_t *r, ngx_buf_t *b)
 static ngx_int_t
 ngx_http_test_expect(ngx_http_request_t *r)
 {
+    /*
+    *  检查客户端是否发送了Expect: 100-continue头，
+    *  是的话则给客户端回复"HTTP/1.1 100 Continue"，
+    *  根据http 1.1协议，客户端可以发送一个Expect头来向服务器表明期望发送请求体，
+    *  服务器如果允许客户端发送请求体，则会回复"HTTP/1.1 100 Continue"，
+    *  客户端收到时，才会开始发送请求体。
+    */
     ngx_int_t   n;
     ngx_str_t  *expect;
 
@@ -927,9 +964,16 @@ ngx_http_request_body_length_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     out = NULL;
     ll = &out;
-
+    /*
+    *  filter模块处理的数据的来源：一般是从别的filter模块或者handler模块传递过来的。
+    *  （一般都是需要响应给客户端的数据）
+    *  传递过来的数据一般都是以链表的形式组织的，并且链表可能不是一次性传过来的
+    */
     for (cl = in; cl; cl = cl->next) {
-
+        /*
+        *  循环传进来的链表，将链表数据拷贝到pool中
+        *  注意：为了节省内存和CPU等资源，这里是直接将指针赋给poll,并没有实际的拷贝行为。
+        */
         if (rb->rest == 0) {
             break;
         }
@@ -942,7 +986,7 @@ ngx_http_request_body_length_filter(ngx_http_request_t *r, ngx_chain_t *in)
         b = tl->buf;
 
         ngx_memzero(b, sizeof(ngx_buf_t));
-
+        //直接赋值指针
         b->temporary = 1;
         b->tag = (ngx_buf_tag_t) &ngx_http_read_client_request_body;
         b->start = cl->buf->pos;
@@ -967,7 +1011,7 @@ ngx_http_request_body_length_filter(ngx_http_request_t *r, ngx_chain_t *in)
         *ll = tl;
         ll = &tl->next;
     }
-
+    // ngx_http_request_body_save_filter: 将读取到的数据保存到pool或者写到临时文件中
     rc = ngx_http_top_request_body_filter(r, out);
 
     ngx_chain_update_chains(r->pool, &rb->free, &rb->busy, &out,
@@ -1120,7 +1164,7 @@ ngx_http_request_body_chunked_filter(ngx_http_request_t *r, ngx_chain_t *in)
             return NGX_HTTP_BAD_REQUEST;
         }
     }
-
+    // 调用 ngx_http_request_body_save_filter 
     rc = ngx_http_top_request_body_filter(r, out);
 
     ngx_chain_update_chains(r->pool, &rb->free, &rb->busy, &out,

@@ -824,7 +824,7 @@ ngx_http_proxy_handler(ngx_http_request_t *r)
 #if (NGX_HTTP_CACHE)
     ngx_http_proxy_main_conf_t  *pmcf;
 #endif
-
+    //创建 ngx_http_upstream_t 对象
     if (ngx_http_upstream_create(r) != NGX_OK) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -863,7 +863,8 @@ ngx_http_proxy_handler(ngx_http_request_t *r)
     u->caches = &pmcf->caches;
     u->create_key = ngx_http_proxy_create_key;
 #endif
-
+    // 初始化请求处理函数
+    //（为什么每次请求都重新设置呢？？？？？）
     u->create_request = ngx_http_proxy_create_request;
     u->reinit_request = ngx_http_proxy_reinit_request;
     u->process_header = ngx_http_proxy_process_status_line;
@@ -880,7 +881,10 @@ ngx_http_proxy_handler(ngx_http_request_t *r)
     }
 
     u->buffering = plcf->upstream.buffering;
-
+    // ngx_event_pipe_t 类型是一个连接上游和下游通信的关键数据结构
+    // 持有 upstream : 和上游服务器的链接
+    // 持有 downstream: 和下游客户端的链接
+    // 同时还有缓冲区等数据结构
     u->pipe = ngx_pcalloc(r->pool, sizeof(ngx_event_pipe_t));
     if (u->pipe == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
@@ -902,7 +906,9 @@ ngx_http_proxy_handler(ngx_http_request_t *r)
     {
         r->request_body_no_buffering = 1;
     }
-
+    // 开始读取请求包体，读取结束后，开始调用ngx_http_upstream_init，开始upstream的流程
+    // 读取到的请求内容你跟，通过r->bufs即可取到
+    // ngx_http_upstream_init是读取到请求体之后的业务逻辑
     rc = ngx_http_read_client_request_body(r, ngx_http_upstream_init);
 
     if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
